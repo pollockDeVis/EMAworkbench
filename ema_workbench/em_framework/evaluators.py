@@ -30,6 +30,8 @@ from .optimization import (
     process_uncertainties,
     process_robust,
     _optimize,
+    epsilon_nondominated,
+    nondominated,
 )
 from .outcomes import ScalarOutcome, AbstractOutcome
 from .salib_samplers import SobolSampler, MorrisSampler, FASTSampler
@@ -679,6 +681,7 @@ def optimize(
     algorithm=EpsNSGAII,
     nfe=10000,
     searchover="levers",
+    seeds=5,
     evaluator=None,
     reference=None,
     convergence=None,
@@ -696,6 +699,7 @@ def optimize(
     algorithm : a valid Platypus optimization algorithm
     nfe : int
     searchover : {'uncertainties', 'levers'}
+    seeds : int, list of ins, optional
     evaluator : evaluator instance
     reference : Policy or Scenario instance, optional
                 overwrite the default scenario in case of searching over
@@ -741,17 +745,40 @@ def optimize(
     if not evaluator:
         evaluator = SequentialEvaluator(models)
 
-    return _optimize(
-        problem,
-        evaluator,
-        algorithm,
-        convergence,
-        nfe,
-        convergence_freq,
-        logging_freq,
-        variator=variator,
-        **kwargs,
-    )
+    results = []
+    convergences = []
+    try:
+        len(seeds)
+    except TypeError:
+        seeds = range(seeds)
+
+    for seed in seeds:
+        # set seed
+        random.seed(seed)
+
+        result, convergence_results = _optimize(
+            problem,
+            evaluator,
+            algorithm,
+            convergence,
+            nfe,
+            convergence_freq,
+            logging_freq,
+            variator=variator,
+            **kwargs,
+        )
+        results.append(result)
+        convergences.append(convergence_results)
+
+    # redo non dominated sort
+    try:
+        result = epsilon_nondominated(results, kwargs["epsilons"], problem)
+    except KeyError:
+        result = nondominated(results, problem)
+
+    _logger.info(f"optimization for {len(seeds)} seeds completed, found {len(result)} solutions")
+
+    return result, convergences
 
 
 def robust_optimize(

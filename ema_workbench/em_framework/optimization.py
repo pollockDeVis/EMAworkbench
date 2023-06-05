@@ -49,12 +49,14 @@ try:
         Solution,
         InvertedGenerationalDistance,
         Spacing,
+        Archive,
     )  # @UnresolvedImport
     from platypus import Problem as PlatypusProblem
 
     import platypus
 
 
+# TODO:: do we want to keep supporting this or just make platypus required
 except ImportError:
     warnings.warn("platypus based optimization not available", ImportWarning)
 
@@ -767,6 +769,7 @@ def epsilon_nondominated(results, epsilons, problem):
     Returns
     -------
     DataFrame
+
     Notes
     -----
     this is a platypus based alternative to pareto.py (https://github.com/matthewjwoodruff/pareto.py)
@@ -779,6 +782,28 @@ def epsilon_nondominated(results, epsilons, problem):
     results = pd.concat(results, ignore_index=True)
     solutions = rebuild_platypus_population(results, problem)
     archive = EpsilonBoxArchive(epsilons)
+    archive += solutions
+
+    return to_dataframe(archive, problem.parameter_names, problem.outcome_names)
+
+
+def nondominated(results, problem):
+    """Merge the list of results into a single set of
+    non dominated results
+
+    Parameters
+    ----------
+    results : list of DataFrames
+    problem : PlatypusProblem instance
+
+    Returns
+    -------
+    DataFrame
+
+    """
+    results = pd.concat(results, ignore_index=True)
+    solutions = rebuild_platypus_population(results, problem)
+    archive = Archive()
     archive += solutions
 
     return to_dataframe(archive, problem.parameter_names, problem.outcome_names)
@@ -810,7 +835,7 @@ class Convergence(ProgressTrackingMixIn):
         self.convergence_freq = convergence_freq
         self.logging_freq = logging_freq
 
-        # TODO what is the point of this code?
+        # TODO is it not clumpsy that we use a reset?
         for metric in metrics:
             assert isinstance(metric, AbstractConvergenceMetric)
             metric.reset()
@@ -1038,6 +1063,25 @@ def _optimize(
     variator=None,
     **kwargs,
 ):
+    """
+
+    Parameters
+    ----------
+    problem : platupus.Problem instance
+    evaluator : BaseEvaluator instance
+    algorithm : platypus Algorithm instance
+    convergence
+    nfe : int
+    convergence_freq : int
+    logging_freq : int
+    variator : platypus Variator instance
+    kwargs
+
+    Returns
+    -------
+    results, convergence
+
+    """
     klass = problem.types[0].__class__
 
     try:
@@ -1053,12 +1097,10 @@ def _optimize(
             variator = None
         else:
             variator = CombinedVariator()
-    # mutator = CombinedMutator()
 
     optimizer = algorithm(
         problem, evaluator=evaluator, variator=variator, log_frequency=500, **kwargs
     )
-    # optimizer.mutator = mutator
 
     convergence = Convergence(
         convergence, nfe, convergence_freq=convergence_freq, logging_freq=logging_freq
@@ -1076,8 +1118,7 @@ def _optimize(
     results = to_dataframe(optimizer.result, problem.parameter_names, problem.outcome_names)
     convergence = convergence.to_dataframe()
 
-    message = "optimization completed, found {} solutions"
-    _logger.info(message.format(len(optimizer.archive)))
+    # _logger.info(f"optimization for 1 seed completed, found {len(optimizer.archive)} solutions")
 
     if convergence.empty:
         return results
