@@ -481,12 +481,12 @@ def run_experiment_mpi(packed_data):
     rank = COMM_WORLD.Get_rank()
 
     experiment, model_name = packed_data
-    _logger.info(f"MPI Rank {rank}: starting {repr(experiment)}")
+    _logger.debug(f"MPI Rank {rank}: starting {repr(experiment)}")
 
     # Use the global ExperimentRunner created by the initializer
     outcomes = experiment_runner.run_experiment(experiment)
 
-    _logger.info(f"MPI Rank {rank}: completed {experiment}")
+    _logger.debug(f"MPI Rank {rank}: completed {experiment}")
 
     return experiment, outcomes
 
