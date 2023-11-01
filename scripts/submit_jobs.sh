@@ -1,7 +1,11 @@
 #!/bin/bash
 
 # Array of CPU counts to test: 12 for 0.25 node, 24 for 0.5 node, and so on...
-declare -a core_counts=(12 24 48 96 192 384 768 1536)
+declare -a core_counts=(48 96 192 384 768 1536)
+
+echo "Installing EMAworkbench..."
+python -m pip install --user -U -e git+https://github.com/quaquel/EMAworkbench@MPIEvaluator#egg=ema-workbench
+echo "EMAworkbench installed!"
 
 # Loop over core counts
 for total_tasks in "${core_counts[@]}"; do
@@ -14,16 +18,16 @@ for total_tasks in "${core_counts[@]}"; do
 #!/bin/bash
 
 #SBATCH --job-name="Bench_${nodes}nodes"
-#SBATCH --time=00:30:00
+#SBATCH --time=06:00:00
 #SBATCH --ntasks=${total_tasks}
 #SBATCH --cpus-per-task=1
+#SBATCH --exclusive
 #SBATCH --partition=compute
-#SBATCH --mem-per-cpu=1GB
 #SBATCH --account=research-tpm-mas
 
 module load 2023r1
 module load openmpi
-module load python/3.10
+module load python
 module load py-numpy
 module load py-mpi4py
 module load py-pip
