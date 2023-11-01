@@ -15,7 +15,7 @@ from ema_workbench import (
     ema_logging,
 )
 
-logging_level = 20
+logging_level = 30
 
 def some_model(x1=None, x2=None, x3=None):
     return {"y": x1 * x2 + x3}

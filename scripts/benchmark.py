@@ -24,13 +24,8 @@ def benchmark_model_evaluator_combinations(evaluator_classes, model_dict, scenar
             print(f"Running {model_name} with {evaluator_name}")
             scenarios = scenarios_per_model[model_function]
 
-            kwargs = {}
-            # Pass the n_processes argument only if the evaluator is MultiprocessingEvaluator or MPIEvaluator
-            if evaluator_class in [MultiprocessingEvaluator, MPIEvaluator]:
-                kwargs["n_processes"] = 10
-
             time_taken = timeit.repeat(
-                lambda: run_model_with_evaluator(evaluator_class, model_function, scenarios, **kwargs),
+                lambda: run_model_with_evaluator(evaluator_class, model_function, scenarios),
                 number=1,
                 repeat=repeats)
 
@@ -50,9 +45,9 @@ if __name__ == '__main__':
     }
 
     scenarios_per_model = {
-        get_python_model_instance: 100,
- #       get_lake_model_instance: 1000,
- #       get_flu_model_instance: 250
+        get_python_model_instance: 10000,
+        get_lake_model_instance: 1000,
+        get_flu_model_instance: 250
     }
 
     results = benchmark_model_evaluator_combinations(evaluators_to_test, model_dict, scenarios_per_model)

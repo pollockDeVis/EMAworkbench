@@ -1,12 +1,11 @@
 #!/bin/bash
 
 #SBATCH --job-name="Python_test"
-#SBATCH --time=00:02:00
+#SBATCH --time=00:15:00
 #SBATCH --nodes=1
 #SBATCH --exclusive
 #SBATCH --mem=0
 #SBATCH --partition=compute
-#SBATCH --mem-per-cpu=1GB
 #SBATCH --account=research-tpm-mas
 
 module load 2023r1
