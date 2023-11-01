@@ -443,8 +443,9 @@ class MPIEvaluator(BaseEvaluator):
     def evaluate_experiments(self, scenarios, policies, callback, combine="factorial"):
         ex_gen = experiment_generator(scenarios, self._msis, policies, combine=combine)
         experiments = list(ex_gen)
+        log_level = _logger.getEffectiveLevel()
 
-        packed = [(experiment, experiment.model_name, self._msis) for experiment in experiments]
+        packed = [(experiment, experiment.model_name, self._msis, log_level) for experiment in experiments]
 
         _logger.info(
             f"MPIEvaluator: Starting {len(packed)} experiments using MPI pool with {self._pool._max_workers} workers"
@@ -462,7 +463,9 @@ def run_experiment_mpi(packed_data):
 
     rank = COMM_WORLD.Get_rank()
 
-    experiment, model_name, msis = packed_data
+    experiment, model_name, msis, level = packed_data
+
+    logging.basicConfig(level=level, format="[%(processName)s/%(levelname)s] %(message)s")
     _logger.debug(f"MPI Rank {rank}: starting {repr(experiment)}")
 
     models = NamedObjectMap(AbstractModel)
