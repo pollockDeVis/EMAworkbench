@@ -3,6 +3,13 @@
 # Array of CPU counts to test: 12 for 0.25 node, 24 for 0.5 node, and so on...
 declare -a core_counts=(48 96 192 384 768 1536)
 
+echo "Loading modules..."
+module load 2023r1
+module load openmpi
+module load python
+module load py-numpy
+module load py-mpi4py
+module load py-pip
 echo "Installing EMAworkbench..."
 python -m pip install --user -U -e git+https://github.com/quaquel/EMAworkbench@MPIEvaluator#egg=ema-workbench
 echo "EMAworkbench installed!"
@@ -36,7 +43,7 @@ module load py-pip
 # Set the PYTHONPATH to include local user directory
 export PYTHONPATH=/home/eterhoeven/.local/lib/python3.10/site-packages:$PYTHONPATH
 
-# Export the NODE_MULTIPLIER for benchmark_scaling.py
+# Export the NODE_MULTIPLIER environment variable
 export NODE_MULTIPLIER=${nodes}
 
 mpiexec -n ${total_tasks} python -m mpi4py.futures benchmark_scaling.py
