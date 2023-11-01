@@ -1,5 +1,5 @@
 import pickle
-import sys
+import os
 
 from ema_workbench import (MPIEvaluator, perform_experiments)
 from models_to_benchmark import get_lake_model_instance
@@ -13,19 +13,15 @@ def run_model_with_evaluator(evaluator_class, model_function, scenarios):
 
 
 if __name__ == '__main__':
-    if len(sys.argv) > 1:
-        node_multiplier = float(sys.argv[1])
-    else:
-        node_multiplier = 1  # default value if not provided
-        print("Warning: No node multiplier provided, using default value of 1")
+    node_multiplier = float(os.environ.get('NODE_MULTIPLIER', '1'))
     cpu_multiplier = 48 * node_multiplier
 
-    n_scenarios = 100000
+    n_scenarios = 10000
     print(f"Benchmarking {n_scenarios} Lake model iterations on DelftBlue with {node_multiplier} node(s) ({cpu_multiplier} CPU cores)")
     time_taken = timeit.repeat(
                 lambda: run_model_with_evaluator(evaluator_class=MPIEvaluator, model_function=get_lake_model_instance, scenarios=n_scenarios),
                 number=1,
-                repeat=10)
+                repeat=5)
     print(f"Time taken: {time_taken}")
 
     # Save results
