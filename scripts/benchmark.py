@@ -53,7 +53,7 @@ if __name__ == '__main__':
     results = benchmark_model_evaluator_combinations(evaluators_to_test, model_dict, scenarios_per_model)
 
     # Save results
-    with open("benchmark_results.pickle", "wb") as handle:
+    with open("benchmark_results_DelftBlue.pickle", "wb") as handle:
         pickle.dump(results, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
     # Print results
