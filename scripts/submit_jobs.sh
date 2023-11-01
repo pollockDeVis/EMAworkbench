@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Array of CPU counts to test: 12 for 0.25 node, 24 for 0.5 node, and so on...
-declare -a core_counts=(12 24 48 96) # 192 384 768 1536)
+declare -a core_counts=(12 24 48 96 192 384 768 1536)
 
 # Loop over core counts
 for total_tasks in "${core_counts[@]}"; do
@@ -14,7 +14,7 @@ for total_tasks in "${core_counts[@]}"; do
 #!/bin/bash
 
 #SBATCH --job-name="Python_test_${nodes}nodes"
-#SBATCH --time=00:06:00
+#SBATCH --time=120:00:00
 #SBATCH --ntasks=${total_tasks}
 #SBATCH --exclusive
 #SBATCH --cpus-per-task=1
