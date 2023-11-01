@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Array of CPU counts to test: 12 for 0.25 node, 24 for 0.5 node, and so on...
-declare -a core_counts=(24 48 96) # 192 384 768 1536)
+declare -a core_counts=(12 24 48 96 192 384 768 1536)
 
 # Loop over core counts
 for total_tasks in "${core_counts[@]}"; do
@@ -14,7 +14,7 @@ for total_tasks in "${core_counts[@]}"; do
 #!/bin/bash
 
 #SBATCH --job-name="Bench_${nodes}nodes"
-#SBATCH --time=00:03:00
+#SBATCH --time=00:30:00
 #SBATCH --ntasks=${total_tasks}
 #SBATCH --cpus-per-task=1
 #SBATCH --partition=compute
@@ -34,7 +34,7 @@ export PYTHONPATH=/home/eterhoeven/.local/lib/python3.10/site-packages:$PYTHONPA
 # Export the NODE_MULTIPLIER for benchmark_scaling.py
 export NODE_MULTIPLIER=${nodes}
 
-mpiexec -n ${total_tasks} python -m mpi4py.futures benchmark_scaling2.py
+mpiexec -n ${total_tasks} python -m mpi4py.futures benchmark_scaling.py
 EOF
 
     # Submit the job
