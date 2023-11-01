@@ -1,0 +1,25 @@
+wsl
+cd /mnt
+cd "c/Users/Ewout/Documents/GitHub/EMAworkbench"
+
+sudo apt update && sudo apt install openmpi-bin libopenmpi-dev
+
+export PYTHONPATH=$PYTHONPATH:$(pwd)
+
+pip install -U pip
+pip install -U wheel setuptools
+pip install -U mpi4py
+pip install -U .
+
+mpiexec python3 -m mpi4py.futures scripts/benchmark.py
+
+# NetLogo install
+wget https://ccl.northwestern.edu/netlogo/6.2.2/NetLogo-6.2.2-64.tgz
+tar -xzf NetLogo-6.2.2-64.tgz
+sudo mv NetLogo\ 6.2.2 /opt/netlogo
+echo 'export PATH=$PATH:/opt/netlogo' >> ~/.bashrc
+source ~/.bashrc
+netlogo-headless.sh --version
+# remove: sudo rm -r /opt/netlogo
+
+mpiexec python3 -m mpi4py.futures scripts/netlogo.py > netlogo.log

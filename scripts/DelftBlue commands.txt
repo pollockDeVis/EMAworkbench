@@ -1,0 +1,50 @@
+# Login (CMD)
+ssh -J eterhoeven@student-linux.tudelft.nl eterhoeven@login.delftblue.tudelft.nl
+
+# Set the directory name
+directory="python-test"
+
+# Move to scratch folder
+cd ../../scratch/eterhoeven
+
+# Check if directory exists
+if [ -d "$directory" ]; then
+  # Remove all files and subdirectories inside the directory
+  rm -r "$directory"/*
+else
+  # Create new directory
+  mkdir "$directory"
+fi
+
+# Change to the specified directory
+cd "$directory"
+
+
+# Move files (NEW CMD)
+cd C:\Users\Ewout\Documents\GitHub\EMAworkbench\scripts
+scp -J eterhoeven@student-linux.tudelft.nl benchmark.py models_to_benchmark.py test_script.sh eterhoeven@login.delftblue.tudelft.nl:/scratch/eterhoeven/python-test
+
+# Check if files are correctly tranfered (Logged in)
+ls
+
+# Note: bash scripts (sh) needs LF line endings. Do that in atom.
+
+# Run batch script
+sbatch test_script.sh
+
+# Check queue
+squeue -u eterhoeven
+
+# Download files (NEW CMD)
+scp -J eterhoeven@student-linux.tudelft.nl eterhoeven@login.delftblue.tudelft.nl:/scratch/eterhoeven/python-test/benchmark_results_DelftBlue_scaling2_*.pickle ./bench
+
+
+
+#
+cd ..
+rm -rf "$directory"
+mkdir "$directory"
+cd "$directory"
+
+#
+pip install -e -U git+https://github.com/quaquel/EMAworkbench@multi-node-development#egg=ema-workbench
