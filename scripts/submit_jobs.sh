@@ -21,6 +21,7 @@ for total_tasks in "${core_counts[@]}"; do
 #SBATCH --time=06:00:00
 #SBATCH --ntasks=${total_tasks}
 #SBATCH --cpus-per-task=1
+#SBATCH --mem-per-cpu=2G
 #SBATCH --exclusive
 #SBATCH --partition=compute
 #SBATCH --account=research-tpm-mas

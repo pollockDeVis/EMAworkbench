@@ -16,7 +16,7 @@ if __name__ == '__main__':
     node_multiplier = float(os.environ.get('NODE_MULTIPLIER', '1'))
     cpu_multiplier = 48 * node_multiplier
 
-    n_scenarios = 250000
+    n_scenarios = 100000
     print(f"Benchmarking {n_scenarios} Lake model iterations on DelftBlue with {node_multiplier} node(s) ({cpu_multiplier} CPU cores)")
     time_taken = timeit.repeat(
                 lambda: run_model_with_evaluator(evaluator_class=MPIEvaluator, model_function=get_lake_model_instance, scenarios=n_scenarios),
