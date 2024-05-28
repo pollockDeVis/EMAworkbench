@@ -49,18 +49,18 @@ def mpi_initializer(models, log_level, root_dir):
     experiment_runner = ExperimentRunner(msis)
 
     # setup the logging
-    info = MPI.INFO_NULL
-    service = "logwatcher"
-    port = MPI.Lookup_name(service)
-    logcomm = MPI.COMM_WORLD.Connect(port, info, 0)
+    # info = MPI.INFO_NULL
+    # service = "logwatcher"
+    # port = MPI.Lookup_name(service)
+    # logcomm = MPI.COMM_WORLD.Connect(port, info, 0)
 
-    root_logger = get_rootlogger()
+    # root_logger = get_rootlogger()
 
-    handler = MPIHandler(logcomm)
-    handler.addFilter(RankFilter(rank))
-    handler.setLevel(log_level)
-    handler.setFormatter(logging.Formatter("[worker %(rank)s/%(levelname)s] %(message)s"))
-    root_logger.addHandler(handler)
+    # handler = MPIHandler(logcomm)
+    # handler.addFilter(RankFilter(rank))
+    # handler.setLevel(log_level)
+    # handler.setFormatter(logging.Formatter("[worker %(rank)s/%(levelname)s] %(message)s"))
+    # root_logger.addHandler(handler)
 
     # setup the working directories
     tmpdir = setup_working_directories(models, root_dir)
@@ -68,7 +68,7 @@ def mpi_initializer(models, log_level, root_dir):
         atexit.register(finalizer(experiment_runner), os.path.abspath(tmpdir))
 
     # _logger.info(f"worker {rank} initialized")
-    root_logger.info(f"worker {rank} initialized")
+    # root_logger.info(f"worker {rank} initialized")
 
 
 def logwatcher(start_event, stop_event):
@@ -175,20 +175,20 @@ class MPIEvaluator(BaseEvaluator):
         # Only import mpi4py if the MPIEvaluator is used, to avoid unnecessary dependencies.
         from mpi4py.futures import MPIPoolExecutor
 
-        start_event = threading.Event()
-        self.stop_event = threading.Event()
-        self.logwatcher_thread = threading.Thread(
-            name="logwatcher",
-            target=logwatcher,
-            daemon=False,
-            args=(
-                start_event,
-                self.stop_event,
-            ),
-        )
-        self.logwatcher_thread.start()
-        start_event.wait()
-        _logger.info("logwatcher server started")
+        # start_event = threading.Event()
+        # self.stop_event = threading.Event()
+        # self.logwatcher_thread = threading.Thread(
+        #     name="logwatcher",
+        #     target=logwatcher,
+        #     daemon=False,
+        #     args=(
+        #         start_event,
+        #         self.stop_event,
+        #     ),
+        # )
+        # self.logwatcher_thread.start()
+        # start_event.wait()
+        # _logger.info("logwatcher server started")
 
         self.root_dir = determine_rootdir(self._msis)
         self._pool = MPIPoolExecutor(
@@ -207,8 +207,8 @@ class MPIEvaluator(BaseEvaluator):
     @method_logger(__name__)
     def finalize(self):
         # submit sentinel
-        self.stop_event.set()
-        self._pool.submit(send_sentinel)
+        # self.stop_event.set()
+        # self._pool.submit(send_sentinel)
         self._pool.shutdown()
         self.logwatcher_thread.join(timeout=60)
 
